@@ -13,10 +13,10 @@ selectable text** (the hard case), not just digital PDFs.
 
 The proof-of-concept corpus is a **Harley-Davidson Softail (1984–1999) service
 manual** — 651 scanned pages, zero embedded text — turned into a mechanic's
-assistant ("Ask Cooter") that answers repair questions and tells you which page to
-open for the original diagram or torque spec. The defaults in `.env.example` point
-at that manual, but nothing in the pipeline is motorcycle-specific: set `PDF_PATH`
-to any PDF and re-run the ingest.
+assistant ("Ask Cooter") that answers repair questions and cites the page to open
+for the original diagram or torque spec. The defaults in `.env.example` point at
+that manual; nothing in the pipeline is motorcycle-specific: set `PDF_PATH` to any
+PDF and re-run the ingest.
 
 See [DESIGN.md](DESIGN.md) for the architecture and rationale.
 
@@ -46,8 +46,8 @@ Question → embed → pgvector similarity search → cited passages → answer 
 - **Python 3.11+**
 - **PostgreSQL 18** (installed at `C:\Program Files\PostgreSQL\18`, port **5433**)
   with the **pgvector** extension. pgvector ships no Windows binaries, so it's
-  compiled from source (see step 1) and installed with a script. The compiled
-  `.dll` is **not committed** — you build it locally. No Docker.
+  compiled from source (step 1) and installed with a script. The compiled `.dll`
+  is **not committed**; build it locally. No Docker.
 - **API keys**: `ANTHROPIC_API_KEY` (vision extraction) and `VOYAGE_API_KEY`
   (embeddings). Anthropic doesn't do embeddings, so Voyage is a separate signup.
 
@@ -76,9 +76,9 @@ Copy the outputs into `pgvector-build\` (where the install script looks):
 Copy-Item pgvector\vector.dll, pgvector\vector.control, pgvector\sql\vector--*.sql pgvector-build\
 ```
 
-> On PG18 the standard build links cleanly. (On PG17, EDB's build didn't export
-> `float_to_shortest_decimal_*`; you'd need a small shim defining those functions,
-> added to `OBJS` in `Makefile.win`. PG18 exports them, so it isn't needed here.)
+> On PG18 the standard build links cleanly. (On PG17, EDB's build did not export
+> `float_to_shortest_decimal_*`; a small shim defining those functions, added to
+> `OBJS` in `Makefile.win`, is required. PG18 exports them, so no shim is needed.)
 
 **2. Install pgvector into PostgreSQL 18** (copies the files into Program Files —
 needs admin; the script self-elevates via UAC):
@@ -87,7 +87,7 @@ needs admin; the script self-elevates via UAC):
 powershell -ExecutionPolicy Bypass -File scripts\install-pgvector.ps1
 ```
 
-**3. Create the database + role + extension** (prompts for your `postgres`
+**3. Create the database + role + extension** (prompts for the `postgres`
 superuser password; PG18 is on port 5433):
 
 ```powershell
@@ -259,28 +259,21 @@ from version control (see `.gitignore`).
 
 ## Known limitations & tech debt
 
-- **Embedding dim is hardcoded in `schema.sql` (`VECTOR(1024)`).** It must match
-  `EMBED_DIM` and the Voyage model's native dimension. Changing `VOYAGE_MODEL` to a
-  different-dimension model requires editing the DDL **and a full re-embed** — there's
-  no migration path. Footgun; document before changing.
-- **Ingest is sequential.** 651 pages one-at-a-time (~1–2s each ≈ 15–25 min). Fine
-  for a one-time run; a thread pool over pages would cut it substantially if needed.
-  Retry is "re-run the command" (per-page commit + skip), not in-process backoff —
-  the Anthropic SDK's built-in 429/5xx retries cover most transient failures.
-- **Citation fidelity is prompt-enforced, not guaranteed.** The `ask` tool /
-  `answer.py` synthesize a grounded, cited answer server-side. But `search_manual`
-  still returns raw passages for an MCP host to synthesize itself, and in both
-  paths the model is *instructed* to cite — there's no hard post-check that every
-  claim maps to a retrieved page. A verification pass would harden it.
-- **HNSW is overkill at this scale.** A few thousand chunks would be exact-searched
-  in milliseconds by a plain scan; HNSW trades a little recall for speed we don't
-  need here. Harmless, but could be dropped for guaranteed 100% recall.
-- **Chunking uses a char≈token approximation** (`len//4`), not a real tokenizer.
-  Fine for short manual pages; revisit only if chunks get large.
+- **Embedding dimension is hardcoded in `schema.sql` (`VECTOR(1024)`).** It must
+  match `EMBED_DIM` and the Voyage model's native dimension. Changing `VOYAGE_MODEL`
+  to a different-dimension model requires editing the DDL and a full re-embed; there
+  is no migration path.
+- **Ingest is sequential.** ~1–2s per page (≈15–25 min for 651 pages). A thread pool
+  over pages would parallelize it. Retry is re-running the command (per-page commit +
+  skip); the Anthropic SDK retries 429/5xx transient failures.
+- **Citation fidelity is prompt-enforced, not guaranteed.** `ask` / `answer.py`
+  synthesize a cited answer server-side; `search_manual` returns raw passages for an
+  MCP host to synthesize. In both paths the model is instructed to cite; there is no
+  post-check that every claim maps to a retrieved page.
+- **Chunking uses a char≈token approximation** (`len//4`). The value is stored as
+  metadata only; chunk boundaries are character-bounded, not token-based.
 - **Windows/EDB-specific build.** The pgvector build and install scripts hardcode
   `C:\Program Files\PostgreSQL\18` and the MSVC toolchain. Not portable as-is.
-- **No automated tests.** Verification so far is manual (compile + render + a live
-  query). A few unit tests (chunker, retrieval SQL) and one integration test would
-  be cheap insurance.
-- **`printed_page` is model-read per page.** Occasional OCR misreads of the printed
-  label are possible; `pdf_page` (authoritative) is always correct for jumping.
+- **No automated tests.** Verification is manual (compile, render, live query).
+- **`printed_page` is model-read per page.** OCR misreads of the printed label are
+  possible; `pdf_page` is authoritative for jumping.
