@@ -61,10 +61,19 @@ def build_chat_messages(
         if role in ("user", "assistant") and content:
             messages.append({"role": role, "content": content})
     messages.append({"role": "user", "content": user})
-    # Anthropic requires the first message to be a user turn.
-    while messages and messages[0]["role"] != "user":
-        messages.pop(0)
-    return system, messages
+    # Anthropic requires messages to start with a user turn and alternate roles.
+    # Collapse any consecutive same-role turns (keeping the later one) so a
+    # malformed client history can't produce a 400, and always end on the
+    # current user turn.
+    normalized: list[dict] = []
+    for m in messages:
+        if normalized and normalized[-1]["role"] == m["role"]:
+            normalized[-1] = m
+        else:
+            normalized.append(m)
+    while normalized and normalized[0]["role"] != "user":
+        normalized.pop(0)
+    return system, normalized
 
 
 @dataclass
@@ -86,7 +95,7 @@ def answer(question: str, *, limit: int | None = None) -> AnswerResult:
     client = anthropic.Anthropic(api_key=cfg.anthropic_api_key)
     resp = client.messages.create(
         model=cfg.answer_model,
-        max_tokens=1500,
+        max_tokens=2048,
         system=system,
         messages=[{"role": "user", "content": user}],
     )

@@ -277,5 +277,9 @@ from version control (see `.gitignore`).
 - **Windows/EDB-specific build.** The pgvector build and install scripts hardcode
   `C:\Program Files\PostgreSQL\18` and the MSVC toolchain. Not portable as-is.
 - **No automated tests.** Verification is manual (compile, render, live query).
+- **Follow-up retrieval uses the current question only.** The chat UI passes prior
+  turns to the answer model, but retrieval embeds just the latest question, so
+  elliptical follow-ups ("what about the front one?") can retrieve poorly. Query
+  rewriting would address it.
 - **`printed_page` is model-read per page.** OCR misreads of the printed label are
   possible; `pdf_page` is authoritative for jumping.

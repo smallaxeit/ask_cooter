@@ -92,7 +92,10 @@ asks Claude (`ANSWER_MODEL`) to write a direct answer that:
   - `get_page(pdf_page)` → full page text + specs + figures + image path
   - `get_torque_spec(component)` → structured spec lookup
   - `list_sections()` → section table of contents
-- **Chat UI** (`askcooter/web`): FastAPI + streaming SSE, single self-contained page.
+- **Chat UI** (`askcooter/web`): FastAPI + streaming SSE, single self-contained
+  page. Renders markdown, keeps multi-turn context, and turns source citations
+  into links that open the original page (extracted text + the scanned image via
+  `/api/page` and `/api/page-image`).
 
 ### 3.5 Citations & page traceability (hard requirement)
 
@@ -150,6 +153,9 @@ user_history(
 4. **Embedding dimension is hardcoded** (`VECTOR(1024)`); changing the Voyage model
    requires a DDL change and a full re-embed (no migration path).
 5. **No answer-level verification** — citations are prompt-enforced, not checked.
+7. **Follow-up retrieval** — the chat UI passes prior turns to the answer model,
+   but retrieval embeds only the current question. Pronoun/elliptical follow-ups
+   ("what about the front one?") may retrieve poorly; query rewriting would fix it.
 6. **Windows/EDB-specific build** — pgvector was compiled from source for PG18
    (ships no Windows binaries); see README. Not portable as-is.
 

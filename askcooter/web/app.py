@@ -84,7 +84,7 @@ def api_ask(req: AskRequest) -> StreamingResponse:
         try:
             with client.messages.stream(
                 model=cfg.answer_model,
-                max_tokens=1500,
+                max_tokens=2048,
                 system=system,
                 messages=messages,
             ) as stream:

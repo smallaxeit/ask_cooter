@@ -285,7 +285,6 @@
 
     async function ask(question){
       const history = chat.map(t => ({ role: t.role, content: t.content }));
-      chat.push({ role: "user", content: question });
       addBubble("user").querySelector(".bubble").textContent = question;
 
       const wrap = addBubble("cooter");
@@ -326,7 +325,7 @@
         bubble.classList.remove("blink");
         if (!answer) { bubble.textContent = aborted ? "(stopped)" : "(no answer)"; }
         else bubble.innerHTML = renderMarkdown(answer);
-        if (answer) { chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); }
+        if (answer) { chat.push({ role: "user", content: question }); chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); }
         renderSources(wrap, sources);
         controller = null; setBusy(false); scrollDown();
       }
