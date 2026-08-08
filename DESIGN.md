@@ -95,7 +95,10 @@ asks Claude (`ANSWER_MODEL`) to write a direct answer that:
 - **Chat UI** (`askcooter/web`): FastAPI + streaming SSE, single self-contained
   page. Renders markdown, keeps multi-turn context, and turns source citations
   into links that open the original page (extracted text + the scanned image via
-  `/api/page` and `/api/page-image`).
+  `/api/page` and `/api/page-image`, with zoom + page-flip via `/api/meta`). A
+  **bike profile** (year/model) is sent with each question and injected into the
+  synthesis prompt; question history is kept client-side (localStorage). Note the
+  DB `user_history` table remains unused — history here is browser-local.
 
 ### 3.5 Citations & page traceability (hard requirement)
 

@@ -149,15 +149,17 @@ python -m askcooter.cli sections
 ## Chat UI
 
 A local single-page chat with streaming answers, rendered markdown, multi-turn
-context, and clickable source citations that open the original page (extracted
-text plus the scanned image):
+context, and clickable source citations that open the original page — extracted
+text plus the scanned image, with zoom and page-flip:
 
 ```bash
 python -m askcooter.cli web            # http://127.0.0.1:8000
 ```
 
-Self-contained (no external assets), light/dark aware. Uses `ANSWER_MODEL` and the
-keys from `.env`. Bind elsewhere with `--host` / `--port`.
+A **bike profile** (year + model, default 1986 Softail Custom) tailors answers to
+your machine, and past questions are kept in a local history sidebar. Self-contained
+(no external assets), light/dark aware. Uses `ANSWER_MODEL` and the keys from
+`.env`. Bind elsewhere with `--host` / `--port`.
 
 ## Accessing the database
 

@@ -45,6 +45,7 @@ def build_chat_messages(
     results: list[SearchResult],
     history: list[dict] | None = None,
     *,
+    bike: str | None = None,
     max_history: int = 6,
 ) -> tuple[str, list[dict]]:
     """Return (system_prompt, messages) for a multi-turn synthesis call.
@@ -52,8 +53,15 @@ def build_chat_messages(
     Prior turns are included so follow-up questions have context. Retrieval still
     runs on the current question only; the retrieved passages are attached to the
     final user turn. The message list is normalized to start with a user turn.
+    ``bike`` (e.g. "1986 Softail Custom") tailors the answer to a model/year.
     """
     system, user = build_messages(question, results)
+    if bike:
+        system += (
+            f"\n\nThe user's motorcycle is a {bike}. Prefer specifications and "
+            "procedures that apply to that year and model, and state explicitly "
+            "when a value differs by year or applies to a different model."
+        )
     messages: list[dict] = []
     for turn in (history or [])[-max_history:]:
         role = turn.get("role")

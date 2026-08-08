@@ -25,6 +25,7 @@ from pydantic import BaseModel
 
 from ..answer import build_chat_messages
 from ..config import cfg
+from ..db import connect
 from ..retrieval import get_page, search_manual
 
 app = FastAPI(title="Ask Cooter")
@@ -45,6 +46,7 @@ class AskRequest(BaseModel):
     question: str
     limit: int | None = None
     history: list[Turn] | None = None
+    bike: str | None = None
 
 
 def _sse(obj: dict) -> str:
@@ -56,6 +58,7 @@ def api_ask(req: AskRequest) -> StreamingResponse:
     question = (req.question or "").strip()
     results = search_manual(question, limit=req.limit or 6) if question else []
     history = [t.model_dump() for t in (req.history or [])]
+    bike = (req.bike or "").strip() or None
 
     def gen():
         sources = [
@@ -79,7 +82,7 @@ def api_ask(req: AskRequest) -> StreamingResponse:
             yield _sse({"type": "done"})
             return
 
-        system, messages = build_chat_messages(question, results, history)
+        system, messages = build_chat_messages(question, results, history, bike=bike)
         client = anthropic.Anthropic(api_key=cfg.anthropic_api_key)
         try:
             with client.messages.stream(
@@ -125,3 +128,16 @@ def api_page_image(pdf_page: int) -> Response:
     if not path.exists():
         raise HTTPException(status_code=404, detail="image file missing")
     return Response(content=path.read_bytes(), media_type="image/png")
+
+
+@app.get("/api/meta")
+def api_meta() -> dict:
+    """Ingested page count and 1-based min/max PDF page (for flip bounds)."""
+    with connect() as c, c.cursor() as cur:
+        cur.execute("SELECT count(*), min(pdf_page), max(pdf_page) FROM pages")
+        n, mn, mx = cur.fetchone()
+    return {
+        "pages": n or 0,
+        "min_page": (mn + 1) if mn is not None else None,
+        "max_page": (mx + 1) if mx is not None else None,
+    }

@@ -22,84 +22,81 @@
     :root[data-theme="dark"] {
       --bg: #16171a; --panel: #1e2024; --ink: #ece9e3; --muted: #9a958c;
       --line: #2c2f34; --accent: #e0894f; --accent-ink: #1a1205;
-      --user: #2a2d31; --code-bg: #24262b; --chip: #26292e;
-      --shadow: 0 10px 30px rgba(0,0,0,.5);
+      --user: #2a2d31; --code-bg: #24262b; --chip: #26292e; --shadow: 0 10px 30px rgba(0,0,0,.5);
     }
     :root[data-theme="light"] {
       --bg: #f4f2ee; --panel: #ffffff; --ink: #1c1b19; --muted: #6b675f;
       --line: #e3e0d8; --accent: #b4531f; --accent-ink: #ffffff;
-      --user: #ece7dd; --code-bg: #f0eee8; --chip: #efece5;
-      --shadow: 0 10px 30px rgba(0,0,0,.14);
+      --user: #ece7dd; --code-bg: #f0eee8; --chip: #efece5; --shadow: 0 10px 30px rgba(0,0,0,.14);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body {
-      margin: 0; background: var(--bg); color: var(--ink);
-      font: 15.5px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex; flex-direction: column;
-    }
-    header {
-      padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    }
-    header .brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+    body { margin: 0; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+      font: 15.5px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    header { padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel);
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    header .brand { display: flex; align-items: baseline; gap: 9px; margin-right: auto; }
     header h1 { margin: 0; font-size: 17px; letter-spacing: .2px; }
     header .sub { color: var(--muted); font-size: 12.5px; }
-    .btn {
-      font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px;
-      border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-      cursor: pointer;
-    }
+    .btn { font: inherit; font-size: 13px; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--line);
+      background: var(--panel); color: var(--ink); cursor: pointer; }
     .btn:hover { border-color: var(--accent); }
-    .btn:disabled { opacity: .5; cursor: default; border-color: var(--line); }
+    .btn:disabled { opacity: .45; cursor: default; border-color: var(--line); }
     .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+    .btn.icon { padding: 6px 9px; }
+    #bikeChip { display: flex; align-items: center; gap: 6px; }
 
+    .shell { flex: 1; display: flex; min-height: 0; }
+    aside#sidebar { width: 250px; flex: none; border-right: 1px solid var(--line); background: var(--panel);
+      display: flex; flex-direction: column; min-height: 0; }
+    aside#sidebar.hidden { display: none; }
+    .side-head { padding: 12px 14px 6px; display: flex; align-items: center; justify-content: space-between; }
+    .side-head span { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+    .side-head button { font-size: 11.5px; color: var(--muted); background: none; border: none; cursor: pointer; }
+    .side-head button:hover { color: var(--accent); }
+    #histList { overflow-y: auto; padding: 4px 8px 12px; }
+    .hist { display: block; width: 100%; text-align: left; font: inherit; font-size: 13px; color: var(--ink);
+      background: none; border: none; border-radius: 7px; padding: 7px 9px; cursor: pointer;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hist:hover { background: var(--chip); }
+    .hist-empty { color: var(--muted); font-size: 12.5px; padding: 8px 10px; }
+
+    main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
     #log { flex: 1; overflow-y: auto; }
     .wrap { max-width: 820px; margin: 0 auto; padding: 22px 20px 8px; }
 
     .msg { margin: 0 0 20px; }
     .msg .role { font-size: 11px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .07em; }
-    .bubble {
-      padding: 13px 16px; border-radius: 13px; border: 1px solid var(--line);
-      background: var(--panel); overflow-wrap: anywhere;
-    }
+    .bubble { padding: 13px 16px; border-radius: 13px; border: 1px solid var(--line); background: var(--panel); overflow-wrap: anywhere; }
     .msg.user .bubble { background: var(--user); }
-
-    /* markdown */
-    .bubble > :first-child { margin-top: 0; }
-    .bubble > :last-child { margin-bottom: 0; }
-    .bubble h1, .bubble h2, .bubble h3, .bubble h4 { line-height: 1.3; margin: 1em 0 .4em; }
+    .bubble > :first-child { margin-top: 0; } .bubble > :last-child { margin-bottom: 0; }
+    .bubble h1,.bubble h2,.bubble h3,.bubble h4 { line-height: 1.3; margin: 1em 0 .4em; }
     .bubble h1 { font-size: 1.3em; } .bubble h2 { font-size: 1.18em; } .bubble h3 { font-size: 1.06em; } .bubble h4 { font-size: 1em; }
     .bubble p { margin: .55em 0; }
-    .bubble ul, .bubble ol { margin: .5em 0; padding-left: 1.4em; }
+    .bubble ul,.bubble ol { margin: .5em 0; padding-left: 1.4em; }
     .bubble li { margin: .2em 0; }
-    .bubble code { background: var(--code-bg); padding: .12em .4em; border-radius: 5px; font-size: .9em; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+    .bubble code { background: var(--code-bg); padding: .12em .4em; border-radius: 5px; font-size: .9em; font-family: ui-monospace, Consolas, monospace; }
     .bubble pre { background: var(--code-bg); padding: 12px 14px; border-radius: 9px; overflow-x: auto; margin: .6em 0; }
     .bubble pre code { background: none; padding: 0; }
     .bubble blockquote { margin: .6em 0; padding: .3em 0 .3em 12px; border-left: 3px solid var(--line); color: var(--muted); }
     .bubble hr { border: none; border-top: 1px solid var(--line); margin: 1em 0; }
     .bubble table { border-collapse: collapse; margin: .7em 0; width: 100%; display: block; overflow-x: auto; }
-    .bubble th, .bubble td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+    .bubble th,.bubble td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
     .bubble th { background: var(--chip); font-weight: 600; }
-    a { color: var(--accent); }
-    a.cite { text-decoration: none; font-weight: 600; white-space: nowrap; }
-    a.cite:hover { text-decoration: underline; }
-
+    a { color: var(--accent); } a.cite { text-decoration: none; font-weight: 600; white-space: nowrap; } a.cite:hover { text-decoration: underline; }
     .tools { display: flex; gap: 8px; margin-top: 8px; }
     .tool { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 2px 4px; }
     .tool:hover { color: var(--accent); }
-
     .sources { margin-top: 10px; }
     .sources .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
     .chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip {
-      font: inherit; font-size: 12.5px; padding: 5px 10px; border-radius: 999px;
-      border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer;
-    }
+    .chip { font: inherit; font-size: 12.5px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line);
+      background: var(--chip); color: var(--ink); cursor: pointer; }
     .chip:hover { border-color: var(--accent); color: var(--accent); }
     .chip .score { color: var(--muted); margin-left: 5px; }
 
-    .empty { color: var(--muted); text-align: center; margin: 12vh auto 0; max-width: 560px; }
+    .empty { color: var(--muted); text-align: center; margin: 10vh auto 0; max-width: 560px; }
     .empty h2 { color: var(--ink); font-size: 19px; margin: 0 0 6px; }
     .suggest { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
     .blink::after { content: "▍"; margin-left: 1px; animation: b 1s steps(2) infinite; color: var(--muted); }
@@ -107,62 +104,86 @@
 
     footer { border-top: 1px solid var(--line); background: var(--panel); }
     form { max-width: 820px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 10px; align-items: flex-end; }
-    textarea {
-      flex: 1; resize: none; max-height: 180px; padding: 11px 14px; border-radius: 11px;
-      border: 1px solid var(--line); background: var(--bg); color: var(--ink);
-      font: inherit; line-height: 1.5;
-    }
+    textarea { flex: 1; resize: none; max-height: 180px; padding: 11px 14px; border-radius: 11px; border: 1px solid var(--line);
+      background: var(--bg); color: var(--ink); font: inherit; line-height: 1.5; }
     textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
     .hint { max-width: 820px; margin: 0 auto; padding: 0 20px 10px; font-size: 11.5px; color: var(--muted); }
 
-    /* modal */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 40; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 22px; z-index: 40; }
     .overlay.open { display: flex; }
-    .modal { background: var(--panel); color: var(--ink); border-radius: 14px; box-shadow: var(--shadow); width: min(1000px, 100%); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-    .modal header { border-bottom: 1px solid var(--line); }
-    .modal .body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; overflow: hidden; min-height: 0; }
+    .modal { background: var(--panel); color: var(--ink); border-radius: 14px; box-shadow: var(--shadow);
+      width: min(1040px, 100%); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal .mhead { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+    .modal .mhead .ttl { font-weight: 600; }
+    .modal .mhead .meta { color: var(--muted); font-size: 12.5px; margin-right: auto; }
+    .modal .mgroup { display: flex; gap: 6px; align-items: center; }
+    .modal .body { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; min-height: 0; }
     .modal .scan { border-right: 1px solid var(--line); overflow: auto; background: var(--bg); padding: 12px; }
-    .modal .scan img { width: 100%; height: auto; border-radius: 6px; display: block; }
+    .modal .scan img { width: 100%; height: auto; border-radius: 6px; display: block; cursor: zoom-in; }
     .modal .text { overflow: auto; padding: 16px 18px; }
-    .modal .text .section { color: var(--muted); font-size: 12.5px; margin-bottom: 8px; }
-    @media (max-width: 760px) { .modal .body { grid-template-columns: 1fr; } .modal .scan { border-right: none; border-bottom: 1px solid var(--line); max-height: 40vh; } }
+    @media (max-width: 760px) { .modal .body { grid-template-columns: 1fr; } .modal .scan { border-right: none; border-bottom: 1px solid var(--line); max-height: 42vh; } }
+
+    /* settings */
+    .form-row { display: flex; flex-direction: column; gap: 5px; margin: 12px 0; }
+    .form-row label { font-size: 12.5px; color: var(--muted); }
+    .form-row input, .form-row select { font: inherit; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+    .settings-body { padding: 16px 18px; overflow: auto; }
+    .settings-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid var(--line); }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand">
-      <h1>Ask Cooter</h1>
-      <span class="sub">Softail 1984–1999 · answers cite the source page</span>
-    </div>
-    <button class="btn" id="theme" title="Toggle theme">◐</button>
+    <button class="btn icon" id="sideToggle" title="History">&#9776;</button>
+    <div class="brand"><h1>Ask Cooter</h1><span class="sub">Softail 1984&ndash;1999 service manual</span></div>
+    <button class="btn" id="bikeChip" title="Change bike">&#127949; <span id="bikeLabel">bike</span></button>
+    <button class="btn icon" id="theme" title="Toggle theme">&#9680;</button>
     <button class="btn" id="clear">New chat</button>
   </header>
 
-  <div id="log">
-    <div class="wrap" id="logInner">
-      <div class="empty" id="empty">
-        <h2>Ask about the Softail</h2>
-        <div>Grounded in the scanned service manual. Every answer cites the page to open for the original.</div>
-        <div class="suggest" id="suggest"></div>
+  <div class="shell">
+    <aside id="sidebar">
+      <div class="side-head"><span>History</span><button id="histClear">Clear</button></div>
+      <div id="histList"></div>
+    </aside>
+
+    <main>
+      <div id="log">
+        <div class="wrap" id="logInner">
+          <div class="empty" id="empty">
+            <h2>Ask about your Softail</h2>
+            <div>Grounded in the scanned service manual. Every answer cites the page to open for the original.</div>
+            <div class="suggest" id="suggest"></div>
+          </div>
+        </div>
       </div>
-    </div>
+      <footer>
+        <form id="form">
+          <textarea id="q" rows="1" placeholder="Ask about your Softail&hellip;  (Enter to send, Shift+Enter for a new line)" autofocus></textarea>
+          <button class="btn primary" id="send" type="submit">Ask</button>
+          <button class="btn" id="stop" type="button" style="display:none">Stop</button>
+        </form>
+        <div class="hint" id="hint"></div>
+      </footer>
+    </main>
   </div>
 
-  <footer>
-    <form id="form">
-      <textarea id="q" rows="1" placeholder="Ask about the Softail…  (Enter to send, Shift+Enter for a new line)" autofocus></textarea>
-      <button class="btn primary" id="send" type="submit">Ask</button>
-      <button class="btn" id="stop" type="button" style="display:none">Stop</button>
-    </form>
-    <div class="hint">Answers are generated from retrieved manual passages and may be incomplete while ingestion is running.</div>
-  </footer>
-
+  <!-- page preview -->
   <div class="overlay" id="overlay">
     <div class="modal">
-      <header>
-        <div class="brand"><h1 id="mTitle">Page</h1><span class="sub" id="mPrinted"></span></div>
+      <div class="mhead">
+        <span class="ttl" id="mTitle">Page</span>
+        <span class="meta" id="mMeta"></span>
+        <div class="mgroup">
+          <button class="btn icon" id="mPrev" title="Previous page">&#8249; Prev</button>
+          <button class="btn icon" id="mNext" title="Next page">Next &#8250;</button>
+        </div>
+        <div class="mgroup">
+          <button class="btn icon" id="mZoomOut" title="Zoom out">&minus;</button>
+          <button class="btn icon" id="mZoomReset" title="Fit">Fit</button>
+          <button class="btn icon" id="mZoomIn" title="Zoom in">+</button>
+        </div>
         <button class="btn" id="mClose">Close</button>
-      </header>
+      </div>
       <div class="body">
         <div class="scan" id="mScan"></div>
         <div class="text" id="mText"></div>
@@ -170,34 +191,81 @@
     </div>
   </div>
 
+  <!-- settings -->
+  <div class="overlay" id="setOverlay">
+    <div class="modal" style="width:min(440px,100%)">
+      <div class="mhead"><span class="ttl">Your bike</span></div>
+      <div class="settings-body">
+        <div class="form-row">
+          <label for="setYear">Year</label>
+          <input id="setYear" type="number" min="1984" max="1999" step="1" />
+        </div>
+        <div class="form-row">
+          <label for="setModel">Model</label>
+          <select id="setModel"></select>
+        </div>
+        <div class="hint" style="padding:0">Answers will be tailored to this year and model.</div>
+      </div>
+      <div class="settings-actions">
+        <button class="btn" id="setCancel">Cancel</button>
+        <button class="btn primary" id="setSave">Save</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     "use strict";
-    const log = document.getElementById("log");
-    const logInner = document.getElementById("logInner");
-    const empty = document.getElementById("empty");
-    const form = document.getElementById("form");
-    const input = document.getElementById("q");
-    const sendBtn = document.getElementById("send");
-    const stopBtn = document.getElementById("stop");
-    const clearBtn = document.getElementById("clear");
-    const themeBtn = document.getElementById("theme");
-    const overlay = document.getElementById("overlay");
+    const $ = id => document.getElementById(id);
+    const log = $("log"), logInner = $("logInner"), empty = $("empty");
+    const form = $("form"), input = $("q"), sendBtn = $("send"), stopBtn = $("stop");
+    const overlay = $("overlay"), setOverlay = $("setOverlay");
 
+    const MODELS = {
+      FXST: "Softail Standard", FXSTC: "Softail Custom", FXSTS: "Springer Softail",
+      FXSTB: "Night Train", FXSTSB: "Bad Boy", FLST: "Heritage Softail",
+      FLSTC: "Heritage Softail Classic", FLSTF: "Fat Boy", FLSTN: "Heritage Nostalgia",
+      FLSTS: "Heritage Springer",
+    };
     const SUGGESTIONS = [
       "How much oil does the primary chaincase hold?",
       "How do I test the starter solenoid?",
       "Primary chain free-play adjustment spec",
       "Front fork oil capacity",
     ];
-    const chat = [];          // [{role, content}] conversation memory
-    let controller = null;    // AbortController for the in-flight request
+
+    const chat = [];             // conversation memory [{role,content}]
+    let controller = null;       // in-flight AbortController
+    let minPage = 1, maxPage = 651, modalPage = 1, zoom = 1;
+
+    /* ---------- persistence ---------- */
+    function loadBike(){
+      try { const b = JSON.parse(localStorage.getItem("ac_bike")); if (b && b.year && b.model) return b; } catch {}
+      return { year: 1986, model: "FXSTC" };
+    }
+    function bikeString(b){ return `${b.year} Harley-Davidson ${MODELS[b.model] || b.model} (${b.model})`; }
+    function bikeShort(b){ return `${b.year} ${MODELS[b.model] || b.model}`; }
+    let bike = loadBike();
+    function refreshBike(){ $("bikeLabel").textContent = bikeShort(bike); }
+
+    function loadHist(){ try { return JSON.parse(localStorage.getItem("ac_history")) || []; } catch { return []; } }
+    function addHist(q){
+      let a = loadHist().filter(x => x.toLowerCase() !== q.toLowerCase());
+      a.unshift(q); a = a.slice(0, 50);
+      localStorage.setItem("ac_history", JSON.stringify(a)); renderHist();
+    }
+    function renderHist(){
+      const a = loadHist(), el = $("histList");
+      if (!a.length){ el.innerHTML = `<div class="hist-empty">No questions yet.</div>`; return; }
+      el.innerHTML = a.map(q => `<button class="hist" title="${esc(q)}">${esc(q)}</button>`).join("");
+      [...el.querySelectorAll(".hist")].forEach((b, i) => b.onclick = () => { input.value = a[i]; autosize(); form.requestSubmit(); });
+    }
 
     /* ---------- markdown ---------- */
     function esc(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
     function inline(s){
       s = esc(s);
       const codes = [];
-      s = s.replace(/`([^`]+)`/g, (m,c) => { codes.push(c); return "@@C"+(codes.length-1)+"@@"; });
+      s = s.replace(/`([^`]+)`/g, (m,c) => { codes.push(c); return "@@C" + (codes.length-1) + "@@"; });
       s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (m,t,u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
       s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
       s = s.replace(/(^|[^*\w])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
@@ -205,209 +273,193 @@
       s = s.replace(/@@C(\d+)@@/g, (m,i) => `<code>${codes[+i]}</code>`);
       return s;
     }
-    function isTableSep(line){ return /^\s*\|?[\s:|-]+\|?\s*$/.test(line) && line.includes("-") && line.includes("|"); }
-    function cells(line){ return line.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(c => c.trim()); }
+    function isSep(l){ return /^\s*\|?[\s:|-]+\|?\s*$/.test(l) && l.includes("-") && l.includes("|"); }
+    function cells(l){ return l.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(c => c.trim()); }
     function renderMarkdown(md){
-      const lines = (md || "").replace(/\r\n/g,"\n").split("\n");
-      let out = "", i = 0;
-      while (i < lines.length){
-        let line = lines[i];
-        if (/^\s*```/.test(line)){
-          const buf = []; i++;
-          while (i < lines.length && !/^\s*```/.test(lines[i])) { buf.push(lines[i]); i++; }
-          i++; out += `<pre><code>${esc(buf.join("\n"))}</code></pre>`; continue;
-        }
-        if (line.includes("|") && i+1 < lines.length && isTableSep(lines[i+1])){
-          const head = cells(line); i += 2; const rows = [];
-          while (i < lines.length && lines[i].includes("|") && lines[i].trim() !== "") { rows.push(cells(lines[i])); i++; }
-          let t = "<table><thead><tr>" + head.map(h => `<th>${inline(h)}</th>`).join("") + "</tr></thead><tbody>";
-          for (const r of rows) t += "<tr>" + r.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>";
-          out += t + "</tbody></table>"; continue;
+      const L = (md || "").replace(/\r\n/g,"\n").split("\n"); let out = "", i = 0;
+      while (i < L.length){
+        let line = L[i];
+        if (/^\s*```/.test(line)){ const b = []; i++; while (i < L.length && !/^\s*```/.test(L[i])) { b.push(L[i]); i++; } i++; out += `<pre><code>${esc(b.join("\n"))}</code></pre>`; continue; }
+        if (line.includes("|") && i+1 < L.length && isSep(L[i+1])){
+          const h = cells(line); i += 2; const rows = [];
+          while (i < L.length && L[i].includes("|") && L[i].trim() !== ""){ rows.push(cells(L[i])); i++; }
+          out += "<table><thead><tr>" + h.map(c => `<th>${inline(c)}</th>`).join("") + "</tr></thead><tbody>" +
+            rows.map(r => "<tr>" + r.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>").join("") + "</tbody></table>"; continue;
         }
         let m = line.match(/^(#{1,4})\s+(.*)$/);
-        if (m){ const l = m[1].length; out += `<h${l}>${inline(m[2])}</h${l}>`; i++; continue; }
+        if (m){ out += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; i++; continue; }
         if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)){ out += "<hr>"; i++; continue; }
-        if (/^\s*>/.test(line)){
-          const buf = [];
-          while (i < lines.length && /^\s*>/.test(lines[i])) { buf.push(lines[i].replace(/^\s*>\s?/,"")); i++; }
-          out += `<blockquote>${inline(buf.join(" "))}</blockquote>`; continue;
-        }
+        if (/^\s*>/.test(line)){ const b = []; while (i < L.length && /^\s*>/.test(L[i])) { b.push(L[i].replace(/^\s*>\s?/,"")); i++; } out += `<blockquote>${inline(b.join(" "))}</blockquote>`; continue; }
         if (/^\s*([-*+]|\d+\.)\s+/.test(line)){
-          const ordered = /^\s*\d+\.\s+/.test(line); const items = [];
-          while (i < lines.length && /^\s*([-*+]|\d+\.)\s+/.test(lines[i])){
-            items.push(lines[i].replace(/^\s*([-*+]|\d+\.)\s+/,"")); i++;
-          }
-          out += (ordered ? "<ol>" : "<ul>") + items.map(it => `<li>${inline(it)}</li>`).join("") + (ordered ? "</ol>" : "</ul>"); continue;
+          const ord = /^\s*\d+\.\s+/.test(line); const items = [];
+          while (i < L.length && /^\s*([-*+]|\d+\.)\s+/.test(L[i])){ items.push(L[i].replace(/^\s*([-*+]|\d+\.)\s+/,"")); i++; }
+          out += (ord ? "<ol>" : "<ul>") + items.map(it => `<li>${inline(it)}</li>`).join("") + (ord ? "</ol>" : "</ul>"); continue;
         }
         if (line.trim() === ""){ i++; continue; }
-        const buf = [];
-        while (i < lines.length && lines[i].trim() !== "" && !/^\s*(#{1,4}\s|[-*+]\s|\d+\.\s|>|```)/.test(lines[i]) && !(lines[i].includes("|") && i+1 < lines.length && isTableSep(lines[i+1]))){
-          buf.push(lines[i]); i++;
-        }
-        out += `<p>${inline(buf.join(" "))}</p>`;
+        const b = [];
+        while (i < L.length && L[i].trim() !== "" && !/^\s*(#{1,4}\s|[-*+]\s|\d+\.\s|>|```)/.test(L[i]) && !(L[i].includes("|") && i+1 < L.length && isSep(L[i+1]))){ b.push(L[i]); i++; }
+        out += `<p>${inline(b.join(" "))}</p>`;
       }
       return out;
     }
 
     /* ---------- chat ---------- */
-    function scrollDown(){ log.scrollTop = log.scrollHeight; }
-    function clearEmpty(){ if (empty) empty.remove(); }
-
+    const scrollDown = () => { log.scrollTop = log.scrollHeight; };
     function addBubble(role){
-      clearEmpty();
+      if (empty && empty.parentElement) empty.remove();
       const wrap = document.createElement("div");
       wrap.className = "msg " + role;
       wrap.innerHTML = `<div class="role">${role === "user" ? "You" : "Cooter"}</div><div class="bubble"></div>`;
-      logInner.appendChild(wrap);
-      scrollDown();
+      logInner.appendChild(wrap); scrollDown();
       return wrap;
     }
-
-    function renderSources(afterEl, sources){
+    function renderSources(after, sources){
       if (!sources || !sources.length) return;
-      const box = document.createElement("div");
-      box.className = "sources";
+      const box = document.createElement("div"); box.className = "sources";
       box.innerHTML = `<div class="label">Sources</div><div class="chips">` +
-        sources.map(s => `<button class="chip" data-page="${s.pdf_page}">${esc(s.citation)}<span class="score">${s.score ?? ""}</span></button>`).join("") +
-        `</div>`;
-      afterEl.appendChild(box);
+        sources.map(s => `<button class="chip" data-page="${s.pdf_page}">${esc(s.citation)}<span class="score">${s.score ?? ""}</span></button>`).join("") + `</div>`;
+      after.appendChild(box);
     }
-
     function addTools(wrap, getText){
-      const bar = document.createElement("div");
-      bar.className = "tools";
-      const copy = document.createElement("button");
-      copy.className = "tool"; copy.textContent = "Copy";
+      const bar = document.createElement("div"); bar.className = "tools";
+      const copy = document.createElement("button"); copy.className = "tool"; copy.textContent = "Copy";
       copy.onclick = async () => { try { await navigator.clipboard.writeText(getText()); copy.textContent = "Copied"; setTimeout(() => copy.textContent = "Copy", 1200); } catch {} };
-      bar.appendChild(copy);
-      wrap.appendChild(bar);
+      bar.appendChild(copy); wrap.appendChild(bar);
     }
 
     async function ask(question){
+      addHist(question);
       const history = chat.map(t => ({ role: t.role, content: t.content }));
       addBubble("user").querySelector(".bubble").textContent = question;
-
-      const wrap = addBubble("cooter");
-      const bubble = wrap.querySelector(".bubble");
+      const wrap = addBubble("cooter"), bubble = wrap.querySelector(".bubble");
       bubble.classList.add("blink");
       let answer = "", sources = null, aborted = false;
-      controller = new AbortController();
-      setBusy(true);
-
+      controller = new AbortController(); setBusy(true);
       try {
         const resp = await fetch("/api/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, history }),
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, history, bike: bikeString(bike) }),
           signal: controller.signal,
         });
-        const reader = resp.body.getReader();
-        const dec = new TextDecoder();
-        let buf = "";
+        const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = "";
         while (true){
-          const { value, done } = await reader.read();
-          if (done) break;
+          const { value, done } = await reader.read(); if (done) break;
           buf += dec.decode(value, { stream: true });
           const parts = buf.split("\n\n"); buf = parts.pop();
           for (const part of parts){
-            const dl = part.split("\n").find(l => l.startsWith("data:"));
-            if (!dl) continue;
+            const dl = part.split("\n").find(l => l.startsWith("data:")); if (!dl) continue;
             const ev = JSON.parse(dl.slice(5).trim());
             if (ev.type === "sources") sources = ev.sources;
             else if (ev.type === "token"){ answer += ev.text; bubble.innerHTML = renderMarkdown(answer); scrollDown(); }
             else if (ev.type === "error"){ answer += "\n\n**[" + ev.message + "]**"; bubble.innerHTML = renderMarkdown(answer); }
           }
         }
-      } catch (e){
-        if (e.name === "AbortError") aborted = true;
-        else bubble.textContent = "Request failed: " + e;
-      } finally {
+      } catch (e){ if (e.name === "AbortError") aborted = true; else bubble.textContent = "Request failed: " + e; }
+      finally {
         bubble.classList.remove("blink");
-        if (!answer) { bubble.textContent = aborted ? "(stopped)" : "(no answer)"; }
+        if (!answer) bubble.textContent = aborted ? "(stopped)" : "(no answer)";
         else bubble.innerHTML = renderMarkdown(answer);
-        if (answer) { chat.push({ role: "user", content: question }); chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); }
+        if (answer){ chat.push({ role: "user", content: question }); chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); }
         renderSources(wrap, sources);
         controller = null; setBusy(false); scrollDown();
       }
     }
+    function setBusy(b){ sendBtn.disabled = b; sendBtn.style.display = b ? "none" : ""; stopBtn.style.display = b ? "" : "none"; input.disabled = b; if (!b) input.focus(); }
 
-    function setBusy(b){
-      sendBtn.disabled = b; sendBtn.style.display = b ? "none" : "";
-      stopBtn.style.display = b ? "" : "none";
-      input.disabled = b;
-      if (!b) input.focus();
-    }
+    /* ---------- page preview: fetch, flip, zoom ---------- */
+    function applyZoom(){ const img = $("mScan").querySelector("img"); if (!img) return; img.style.width = (zoom * 100) + "%"; img.style.maxWidth = zoom > 1 ? "none" : "100%"; img.style.cursor = zoom > 1 ? "zoom-out" : "zoom-in"; }
+    function setZoom(z){ zoom = Math.min(5, Math.max(1, z)); applyZoom(); }
+    function updateFlip(){ $("mPrev").disabled = modalPage <= minPage; $("mNext").disabled = modalPage >= maxPage; }
 
-    /* ---------- page modal ---------- */
     async function openPage(n){
+      modalPage = n; zoom = 1;
       overlay.classList.add("open");
-      document.getElementById("mTitle").textContent = "PDF page " + n;
-      document.getElementById("mPrinted").textContent = "loading…";
-      const scan = document.getElementById("mScan");
-      const text = document.getElementById("mText");
-      scan.innerHTML = ""; text.innerHTML = "";
+      $("mTitle").textContent = "PDF page " + n;
+      $("mMeta").textContent = "loading…";
+      const scan = $("mScan"), text = $("mText"); scan.innerHTML = ""; text.innerHTML = "";
+      updateFlip();
       try {
-        const d = await (await fetch("/api/page/" + n)).json();
-        document.getElementById("mPrinted").textContent =
-          (d.printed_page ? "printed " + d.printed_page : "") + (d.section ? " · " + d.section : "");
-        if (d.has_image){ const img = new Image(); img.src = "/api/page-image/" + n; img.alt = "scan of page " + n; scan.appendChild(img); }
+        const resp = await fetch("/api/page/" + n);
+        if (!resp.ok){ $("mMeta").textContent = ""; text.innerHTML = `<p style="color:var(--muted)">Page ${n} was not ingested (gap in the run).</p>`; scan.textContent = ""; return; }
+        const d = await resp.json();
+        $("mMeta").textContent = (d.printed_page ? "printed " + d.printed_page : "") + (d.section ? " · " + d.section : "");
+        if (d.has_image){ const img = new Image(); img.onclick = () => setZoom(zoom > 1 ? 1 : 2.2); img.src = "/api/page-image/" + n; img.alt = "scan of page " + n; scan.appendChild(img); applyZoom(); }
         else scan.textContent = "(no scan image on disk)";
         let html = renderMarkdown(d.markdown);
-        if (d.specs && d.specs.length){
-          html += "<h3>Specs</h3><ul>" + d.specs.map(s =>
-            `<li><strong>${esc(s.name || "")}</strong>: ${esc(String(s.value ?? ""))}${s.unit ? " " + esc(s.unit) : ""}${s.notes ? " — " + esc(s.notes) : ""}</li>`).join("") + "</ul>";
-        }
-        if (d.diagrams && d.diagrams.length){
-          html += "<h3>Figures</h3><ul>" + d.diagrams.map(g =>
-            `<li>${g.figure ? "<strong>Fig " + esc(String(g.figure)) + "</strong> " : ""}${g.title ? esc(g.title) + " — " : ""}${esc(g.description || "")}</li>`).join("") + "</ul>";
-        }
+        if (d.specs && d.specs.length) html += "<h3>Specs</h3><ul>" + d.specs.map(s => `<li><strong>${esc(s.name || "")}</strong>: ${esc(String(s.value ?? ""))}${s.unit ? " " + esc(s.unit) : ""}${s.notes ? " &mdash; " + esc(s.notes) : ""}</li>`).join("") + "</ul>";
+        if (d.diagrams && d.diagrams.length) html += "<h3>Figures</h3><ul>" + d.diagrams.map(g => `<li>${g.figure ? "<strong>Fig " + esc(String(g.figure)) + "</strong> " : ""}${g.title ? esc(g.title) + " &mdash; " : ""}${esc(g.description || "")}</li>`).join("") + "</ul>";
         text.innerHTML = html;
       } catch (e){ text.textContent = "Could not load page " + n + ": " + e; }
     }
-    function closeModal(){ overlay.classList.remove("open"); }
-    document.getElementById("mClose").onclick = closeModal;
+    const closeModal = () => overlay.classList.remove("open");
+    $("mClose").onclick = closeModal;
+    $("mPrev").onclick = () => { if (modalPage > minPage) openPage(modalPage - 1); };
+    $("mNext").onclick = () => { if (modalPage < maxPage) openPage(modalPage + 1); };
+    $("mZoomIn").onclick = () => setZoom(zoom * 1.25);
+    $("mZoomOut").onclick = () => setZoom(zoom / 1.25);
+    $("mZoomReset").onclick = () => setZoom(1);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-    /* delegated clicks: citations in answers + source chips */
+    /* delegated clicks: citations + source chips open a page */
     document.addEventListener("click", e => {
-      const el = e.target.closest("[data-page]");
-      if (el){ e.preventDefault(); openPage(+el.getAttribute("data-page")); }
+      const el = e.target.closest("[data-page]"); if (el){ e.preventDefault(); openPage(+el.getAttribute("data-page")); }
     });
+
+    /* ---------- settings ---------- */
+    function openSettings(){
+      $("setYear").value = bike.year;
+      const sel = $("setModel");
+      sel.innerHTML = Object.entries(MODELS).map(([c,n]) => `<option value="${c}">${n} (${c})</option>`).join("");
+      sel.value = bike.model;
+      setOverlay.classList.add("open");
+    }
+    $("bikeChip").onclick = openSettings;
+    $("setCancel").onclick = () => setOverlay.classList.remove("open");
+    setOverlay.addEventListener("click", e => { if (e.target === setOverlay) setOverlay.classList.remove("open"); });
+    $("setSave").onclick = () => {
+      let y = parseInt($("setYear").value, 10); if (isNaN(y)) y = 1986; y = Math.min(1999, Math.max(1984, y));
+      bike = { year: y, model: $("setModel").value };
+      localStorage.setItem("ac_bike", JSON.stringify(bike));
+      refreshBike(); setOverlay.classList.remove("open");
+    };
 
     /* ---------- input / controls ---------- */
     function autosize(){ input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 180) + "px"; }
     input.addEventListener("input", autosize);
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); form.requestSubmit(); }
-    });
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const q = input.value.trim();
-      if (!q || controller) return;
-      input.value = ""; autosize();
-      ask(q);
-    });
+    input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); form.requestSubmit(); } });
+    form.addEventListener("submit", e => { e.preventDefault(); const q = input.value.trim(); if (!q || controller) return; input.value = ""; autosize(); ask(q); });
     stopBtn.onclick = () => { if (controller) controller.abort(); };
-    clearBtn.onclick = () => {
-      chat.length = 0;
-      logInner.innerHTML = "";
-      logInner.appendChild(empty);
-      renderSuggest();
-    };
-    themeBtn.onclick = () => {
+    $("clear").onclick = () => { chat.length = 0; logInner.innerHTML = ""; logInner.appendChild(empty); renderSuggest(); };
+    $("sideToggle").onclick = () => $("sidebar").classList.toggle("hidden");
+    $("histClear").onclick = () => { localStorage.removeItem("ac_history"); renderHist(); };
+    $("theme").onclick = () => {
       const cur = document.documentElement.getAttribute("data-theme");
       const next = cur === "dark" ? "light" : cur === "light" ? "dark" : (matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
       document.documentElement.setAttribute("data-theme", next);
     };
 
+    document.addEventListener("keydown", e => {
+      if (setOverlay.classList.contains("open")){ if (e.key === "Escape") setOverlay.classList.remove("open"); return; }
+      if (!overlay.classList.contains("open")) return;
+      if (e.key === "Escape") closeModal();
+      else if (e.key === "ArrowLeft" && modalPage > minPage) openPage(modalPage - 1);
+      else if (e.key === "ArrowRight" && modalPage < maxPage) openPage(modalPage + 1);
+      else if (e.key === "+" || e.key === "=") setZoom(zoom * 1.25);
+      else if (e.key === "-") setZoom(zoom / 1.25);
+      else if (e.key === "0") setZoom(1);
+    });
+
     function renderSuggest(){
-      const s = document.getElementById("suggest");
-      if (!s) return;
+      const s = $("suggest"); if (!s) return;
       s.innerHTML = SUGGESTIONS.map(q => `<button class="chip">${esc(q)}</button>`).join("");
-      s.querySelectorAll(".chip").forEach((b, idx) => b.onclick = () => { input.value = SUGGESTIONS[idx]; form.requestSubmit(); });
+      [...s.querySelectorAll(".chip")].forEach((b, i) => b.onclick = () => { input.value = SUGGESTIONS[i]; autosize(); form.requestSubmit(); });
     }
-    renderSuggest();
+
+    /* ---------- init ---------- */
+    if (innerWidth < 760) $("sidebar").classList.add("hidden");
+    refreshBike(); renderHist(); renderSuggest();
+    $("hint").textContent = "Answers come from retrieved manual passages and cite the source page.";
+    fetch("/api/meta").then(r => r.json()).then(m => { if (m.min_page) minPage = m.min_page; if (m.max_page) maxPage = m.max_page; }).catch(() => {});
   </script>
 </body>
 </html>
