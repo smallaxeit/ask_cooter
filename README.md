@@ -257,24 +257,8 @@ The Harley-Davidson Softail service manual is **not** part of this repository an
 is not covered by this license; it is copyrighted by its publisher and excluded
 from version control (see `.gitignore`).
 
-## Recommendations & tech debt
+## Known limitations & tech debt
 
-Honest notes on shortcuts taken and where to invest next. Nothing here blocks the
-MVP; they're ranked roughly by payoff.
-
-### Recommendations (do these soon)
-- **Use `claude-sonnet-5` for the full ingest.** 651 vision calls on `claude-opus-5`
-  is the expensive default. Run the 5-page prototype on opus to judge quality, then
-  set `EXTRACT_MODEL=claude-sonnet-5` for the full book if it holds up. Re-extract
-  only the hardest pages (dense wiring diagrams) on opus if needed.
-- **Spot-check extraction on figure-heavy pages** after the full run:
-  `python -m askcooter.cli query "wiring"` and eyeball a few `get_page` dumps.
-  Vision extraction is single-pass with no verification step.
-- **Keep secrets and tunables separate.** Keys live in `.env`; every knob I'd edit
-  (`search_limit`, models, DPI) has a `config.py` default + env override + (for
-  search) a `--limit` flag — so there's no reason to open `.env` to change behavior.
-
-### Known limitations / tech debt
 - **Embedding dim is hardcoded in `schema.sql` (`VECTOR(1024)`).** It must match
   `EMBED_DIM` and the Voyage model's native dimension. Changing `VOYAGE_MODEL` to a
   different-dimension model requires editing the DDL **and a full re-embed** — there's
