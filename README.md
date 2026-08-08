@@ -148,14 +148,16 @@ python -m askcooter.cli sections
 
 ## Chat UI
 
-A local single-page chat, streaming answers with citations:
+A local single-page chat with streaming answers, rendered markdown, multi-turn
+context, and clickable source citations that open the original page (extracted
+text plus the scanned image):
 
 ```bash
-python -m askcooter.cli web            # → http://127.0.0.1:8000
+python -m askcooter.cli web            # http://127.0.0.1:8000
 ```
 
-Self-contained (no external assets), light/dark aware. It uses `ANSWER_MODEL` and
-your keys from `.env`. Bind elsewhere with `--host` / `--port`.
+Self-contained (no external assets), light/dark aware. Uses `ANSWER_MODEL` and the
+keys from `.env`. Bind elsewhere with `--host` / `--port`.
 
 ## Accessing the database
 

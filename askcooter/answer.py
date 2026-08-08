@@ -40,6 +40,33 @@ def build_messages(question: str, results: list[SearchResult]) -> tuple[str, str
     return SYSTEM, user
 
 
+def build_chat_messages(
+    question: str,
+    results: list[SearchResult],
+    history: list[dict] | None = None,
+    *,
+    max_history: int = 6,
+) -> tuple[str, list[dict]]:
+    """Return (system_prompt, messages) for a multi-turn synthesis call.
+
+    Prior turns are included so follow-up questions have context. Retrieval still
+    runs on the current question only; the retrieved passages are attached to the
+    final user turn. The message list is normalized to start with a user turn.
+    """
+    system, user = build_messages(question, results)
+    messages: list[dict] = []
+    for turn in (history or [])[-max_history:]:
+        role = turn.get("role")
+        content = (turn.get("content") or "").strip()
+        if role in ("user", "assistant") and content:
+            messages.append({"role": role, "content": content})
+    messages.append({"role": "user", "content": user})
+    # Anthropic requires the first message to be a user turn.
+    while messages and messages[0]["role"] != "user":
+        messages.pop(0)
+    return system, messages
+
+
 @dataclass
 class AnswerResult:
     answer: str
