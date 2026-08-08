@@ -235,7 +235,7 @@
 
     const chat = [];             // conversation memory [{role,content}]
     let controller = null;       // in-flight AbortController
-    let minPage = 1, maxPage = 651, modalPage = 1, zoom = 1;
+    let minPage = 1, maxPage = 651, modalPage = 1, zoom = 1, panMoved = false;
 
     /* ---------- persistence ---------- */
     function loadBike(){
@@ -367,7 +367,7 @@
     function setBusy(b){ sendBtn.disabled = b; sendBtn.style.display = b ? "none" : ""; stopBtn.style.display = b ? "" : "none"; input.disabled = b; if (!b) input.focus(); }
 
     /* ---------- page preview: fetch, flip, zoom ---------- */
-    function applyZoom(){ const img = $("mScan").querySelector("img"); if (!img) return; img.style.width = (zoom * 100) + "%"; img.style.maxWidth = zoom > 1 ? "none" : "100%"; img.style.cursor = zoom > 1 ? "zoom-out" : "zoom-in"; }
+    function applyZoom(){ const img = $("mScan").querySelector("img"); if (!img) return; img.style.width = (zoom * 100) + "%"; img.style.maxWidth = zoom > 1 ? "none" : "100%"; img.style.cursor = zoom > 1 ? "grab" : "zoom-in"; }
     function setZoom(z){ zoom = Math.min(5, Math.max(1, z)); applyZoom(); }
     function updateFlip(){ $("mPrev").disabled = modalPage <= minPage; $("mNext").disabled = modalPage >= maxPage; }
 
@@ -383,7 +383,7 @@
         if (!resp.ok){ $("mMeta").textContent = ""; text.innerHTML = `<p style="color:var(--muted)">Page ${n} was not ingested (gap in the run).</p>`; scan.textContent = ""; return; }
         const d = await resp.json();
         $("mMeta").textContent = (d.printed_page ? "printed " + d.printed_page : "") + (d.section ? " · " + d.section : "");
-        if (d.has_image){ const img = new Image(); img.onclick = () => setZoom(zoom > 1 ? 1 : 2.2); img.src = "/api/page-image/" + n; img.alt = "scan of page " + n; scan.appendChild(img); applyZoom(); }
+        if (d.has_image){ const img = new Image(); img.draggable = false; img.onclick = () => { if (panMoved) { panMoved = false; return; } setZoom(zoom > 1 ? 1 : 2.2); }; img.src = "/api/page-image/" + n; img.alt = "scan of page " + n; scan.appendChild(img); applyZoom(); }
         else scan.textContent = "(no scan image on disk)";
         let html = renderMarkdown(d.markdown);
         if (d.specs && d.specs.length) html += "<h3>Specs</h3><ul>" + d.specs.map(s => `<li><strong>${esc(s.name || "")}</strong>: ${esc(String(s.value ?? ""))}${s.unit ? " " + esc(s.unit) : ""}${s.notes ? " &mdash; " + esc(s.notes) : ""}</li>`).join("") + "</ul>";
@@ -399,6 +399,28 @@
     $("mZoomOut").onclick = () => setZoom(zoom / 1.25);
     $("mZoomReset").onclick = () => setZoom(1);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+
+    /* drag-to-pan the zoomed scan */
+    (function setupPan(){
+      const scan = $("mScan");
+      let down = false, sx = 0, sy = 0, sl = 0, st = 0;
+      scan.addEventListener("pointerdown", e => {
+        if (zoom <= 1) return;
+        down = true; panMoved = false; sx = e.clientX; sy = e.clientY; sl = scan.scrollLeft; st = scan.scrollTop;
+        try { scan.setPointerCapture(e.pointerId); } catch {}
+        scan.style.cursor = "grabbing"; e.preventDefault();
+      });
+      scan.addEventListener("pointermove", e => {
+        if (!down) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (Math.abs(dx) + Math.abs(dy) > 4) panMoved = true;
+        scan.scrollLeft = sl - dx; scan.scrollTop = st - dy;
+      });
+      const end = e => { if (!down) return; down = false; try { scan.releasePointerCapture(e.pointerId); } catch {} scan.style.cursor = ""; };
+      scan.addEventListener("pointerup", end);
+      scan.addEventListener("pointercancel", end);
+      scan.addEventListener("pointerleave", end);
+    })();
 
     /* delegated clicks: citations + source chips open a page */
     document.addEventListener("click", e => {
