@@ -1,0 +1,30 @@
+# Secrets — never commit
+.env
+*.env
+!.env.example
+# local scratch notes — contains API keys/passwords
+Setup.txt
+
+# Copyrighted source material and derived page images — do NOT commit
+*.pdf
+data/
+
+# Compiled artifacts — platform-specific, build locally (also avoids embedding
+# the builder's absolute paths in the binary)
+*.dll
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# Local tooling / harness — keep out of the repo
+.claude/
+launch.json

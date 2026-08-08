@@ -1,0 +1,10 @@
+# Ask Cooter — Python dependencies
+anthropic>=0.69          # vision extraction (Messages API, image input)
+voyageai>=0.3            # embeddings
+psycopg[binary]>=3.2     # Postgres driver
+pgvector>=0.3            # pgvector <-> psycopg adapter (register_vector)
+pymupdf>=1.24            # render scanned PDF pages to PNG
+mcp>=1.2                 # Model Context Protocol server (FastMCP)
+python-dotenv>=1.0       # load .env for local dev
+fastapi>=0.110           # chat UI backend
+uvicorn[standard]>=0.29  # ASGI server for the chat UI

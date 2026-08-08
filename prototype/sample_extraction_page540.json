@@ -1,0 +1,28 @@
+{
+  "pdf_page": 540,
+  "printed_page": "541",
+  "section": "1995-1999 Service Information",
+  "component_tags": ["starter", "solenoid", "electrical", "wiring"],
+  "year_range": "[1995,2000)",
+  "extracted_markdown": "# 1995-1999 Service Information (p.541)\n\n## Figure 84 — Winding Resistance Test\nDiagram: Solenoid body with a 4-prong connector breaking out to three leads:\n- **GRN** (green)\n- **WHT/BLK** (white/black)\n- **BLK** (black)\nEach lead terminates in a ring terminal. No battery connected in this test.\n\n## Figure 85 — Pull-In Coil Test\nDiagram: Same solenoid/connector, but the GRN and BLK leads are now wired to a battery: BLK lead to the battery (–) terminal, GRN lead to the battery (+) terminal. WHT/BLK lead is left unconnected.\n\n## Procedure (continued from previous page)\n6. Perform the following:\n   a. Switch the ohmmeter to R x 1 and cross the test leads. Then check for ground at the black wire connector in the solenoid connector. **The ohmmeter should read 1 ohm or less.**\n   b. Reconnect the solenoid 4-prong connector.\n   c. Switch the voltmeter to the 12 VDC scale.\n   d. Connect the positive voltmeter lead to the green lead in the 4-prong connector and the negative lead to a good engine ground. Press the start button while reading the voltmeter. **It should be 12 volts.**\n7. If any of the meter readings differ from those specified in Step 6, there is a problem in the solenoid (continues next page).",
+  "diagrams": [
+    {
+      "figure": "84",
+      "title": "Winding Resistance Test",
+      "type": "wiring/test-setup",
+      "description": "Solenoid to 4-prong connector breaking out to GRN, WHT/BLK, and BLK ring-terminal leads. No power source."
+    },
+    {
+      "figure": "85",
+      "title": "Pull-In Coil Test",
+      "type": "wiring/test-setup",
+      "description": "Solenoid leads connected to a battery: BLK to (–), GRN to (+), WHT/BLK unconnected."
+    }
+  ],
+  "specs": [
+    {"name": "black wire ground resistance", "value": "1 ohm or less", "tool": "ohmmeter R x 1"},
+    {"name": "green lead voltage at start", "value": "12 volts", "tool": "voltmeter 12 VDC scale"}
+  ],
+  "image_url": "pages/pdf_540.png",
+  "_note": "Produced by the prototype vision pass. Real pipeline embeds `extracted_markdown` (chunked) via Voyage; `specs` also feed get_torque_spec / spec lookups."
+}
