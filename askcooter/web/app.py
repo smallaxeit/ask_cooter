@@ -30,12 +30,13 @@ from ..db import connect
 from ..retrieval import get_page, search_manual
 
 app = FastAPI(title="Ask Cooter")
-_INDEX_HTML = Path(__file__).with_name("index.html").read_text(encoding="utf-8")
+_INDEX_PATH = Path(__file__).with_name("index.html")
 
 
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
-    return _INDEX_HTML
+    # Read per request so UI edits show on reload without a server restart.
+    return _INDEX_PATH.read_text(encoding="utf-8")
 
 
 class Turn(BaseModel):

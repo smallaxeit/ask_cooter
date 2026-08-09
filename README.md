@@ -173,7 +173,7 @@ The data lives in PostgreSQL 18 (`askcooter` DB, role `cooter`, port **5433**).
   host `localhost`, port `5433`, database `askcooter`, user `cooter`.
 - **Any GUI** (DBeaver, TablePlus): connect to `localhost:5433 / askcooter / cooter`.
 
-Handy queries: `SELECT count(*) FROM pages;` · `SELECT pdf_page, printed_page, section FROM pages ORDER BY pdf_page;` · `SELECT count(*) FROM chunks;`
+Handy queries: `SELECT count(*) FROM pages;` · `SELECT pdf_page, printed_page, section FROM pages ORDER BY pdf_page;` · `SELECT count(*) FROM chunks;` · `SELECT question, created_at FROM user_history ORDER BY id DESC;`
 
 ## Use as an MCP server
 
@@ -231,10 +231,11 @@ askcooter/
     pipeline.py        resumable orchestration
   retrieval.py         query embed + pgvector search + spec/section lookups
   answer.py            retrieval + Claude synthesis (the `ask` layer)
+  history.py           user_history persistence (record / list / clear)
   mcp_server.py        FastMCP server (5 tools)
   cli.py               init-db / ingest / ask / query / sections / web / serve
   web/
-    app.py             FastAPI backend (streaming SSE)
+    app.py             FastAPI backend: /api/ask, /api/page, /api/meta, /api/history
     index.html         single-page chat UI
 scripts/
   install-pgvector.ps1 copy the built extension into PG18 (admin)
@@ -286,5 +287,11 @@ from version control (see `.gitignore`).
   turns to the answer model, but retrieval embeds just the latest question, so
   elliptical follow-ups ("what about the front one?") can retrieve poorly. Query
   rewriting would address it.
+- **History accumulates duplicate rows.** Every ask inserts a `user_history` row,
+  so re-asking a question stores it again; the sidebar dedups for display, but the
+  table grows unbounded. Dedup-on-insert or periodic pruning would bound it.
+- **History token travels in the query string.** `GET/DELETE /api/history?user_token=…`
+  can land in server/access logs. Harmless locally; move to a header or POST body
+  before any networked deployment.
 - **`printed_page` is model-read per page.** OCR misreads of the printed label are
   possible; `pdf_page` is authoritative for jumping.
