@@ -247,17 +247,39 @@
     let bike = loadBike();
     function refreshBike(){ $("bikeLabel").textContent = bikeShort(bike); }
 
-    function loadHist(){ try { return JSON.parse(localStorage.getItem("ac_history")) || []; } catch { return []; } }
-    function addHist(q){
-      let a = loadHist().filter(x => x.toLowerCase() !== q.toLowerCase());
-      a.unshift(q); a = a.slice(0, 50);
-      localStorage.setItem("ac_history", JSON.stringify(a)); renderHist();
+    const TOKEN = (() => { let t = localStorage.getItem("ac_token"); if (!t) { t = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)); localStorage.setItem("ac_token", t); } return t; })();
+    let histItems = [];
+    async function refreshHistory(){
+      try {
+        const r = await fetch("/api/history?user_token=" + encodeURIComponent(TOKEN) + "&limit=100");
+        const j = await r.json(); const seen = new Set(); const out = [];
+        for (const it of (j.items || [])){ const k = (it.question || "").toLowerCase(); if (!k || seen.has(k)) continue; seen.add(k); out.push(it); }
+        histItems = out;
+      } catch {}
+      renderHistList();
     }
-    function renderHist(){
-      const a = loadHist(), el = $("histList");
-      if (!a.length){ el.innerHTML = `<div class="hist-empty">No questions yet.</div>`; return; }
-      el.innerHTML = a.map(q => `<button class="hist" title="${esc(q)}">${esc(q)}</button>`).join("");
-      [...el.querySelectorAll(".hist")].forEach((b, i) => b.onclick = () => { input.value = a[i]; autosize(); form.requestSubmit(); });
+    function renderHistList(){
+      const el = $("histList");
+      if (!histItems.length){ el.innerHTML = `<div class="hist-empty">No questions yet.</div>`; return; }
+      el.innerHTML = histItems.map(it => `<button class="hist" title="${esc(it.question)}">${esc(it.question)}</button>`).join("");
+      [...el.querySelectorAll(".hist")].forEach((b, i) => b.onclick = () => restoreEntry(histItems[i]));
+    }
+    function addLocalHist(question, answer, sources){
+      const item = { question, answer, cited_pdf_pages: (sources || []).map(s => s.pdf_page) };
+      histItems = histItems.filter(it => (it.question || "").toLowerCase() !== question.toLowerCase());
+      histItems.unshift(item); histItems = histItems.slice(0, 100); renderHistList();
+    }
+    function restoreEntry(item){
+      addBubble("user").querySelector(".bubble").textContent = item.question;
+      const wrap = addBubble("cooter"), bubble = wrap.querySelector(".bubble");
+      bubble.innerHTML = renderMarkdown(item.answer || "");
+      addTools(wrap, () => item.answer || "");
+      const src = (item.cited_pdf_pages || []).map(p => ({ pdf_page: p, citation: "PDF p." + p, score: "" }));
+      renderSources(wrap, src);
+      chat.push({ role: "user", content: item.question });
+      chat.push({ role: "assistant", content: item.answer || "" });
+      scrollDown();
+      if (innerWidth < 760) $("sidebar").classList.add("hidden");
     }
 
     /* ---------- markdown ---------- */
@@ -328,7 +350,6 @@
     }
 
     async function ask(question){
-      addHist(question);
       const history = chat.map(t => ({ role: t.role, content: t.content }));
       addBubble("user").querySelector(".bubble").textContent = question;
       const wrap = addBubble("cooter"), bubble = wrap.querySelector(".bubble");
@@ -338,7 +359,7 @@
       try {
         const resp = await fetch("/api/ask", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, history, bike: bikeString(bike) }),
+          body: JSON.stringify({ question, history, bike: bikeString(bike), user_token: TOKEN }),
           signal: controller.signal,
         });
         const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = "";
@@ -359,7 +380,7 @@
         bubble.classList.remove("blink");
         if (!answer) bubble.textContent = aborted ? "(stopped)" : "(no answer)";
         else bubble.innerHTML = renderMarkdown(answer);
-        if (answer){ chat.push({ role: "user", content: question }); chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); }
+        if (answer){ chat.push({ role: "user", content: question }); chat.push({ role: "assistant", content: answer }); addTools(wrap, () => answer); addLocalHist(question, answer, sources); }
         renderSources(wrap, sources);
         controller = null; setBusy(false); scrollDown();
       }
@@ -453,7 +474,7 @@
     stopBtn.onclick = () => { if (controller) controller.abort(); };
     $("clear").onclick = () => { chat.length = 0; logInner.innerHTML = ""; logInner.appendChild(empty); renderSuggest(); };
     $("sideToggle").onclick = () => $("sidebar").classList.toggle("hidden");
-    $("histClear").onclick = () => { localStorage.removeItem("ac_history"); renderHist(); };
+    $("histClear").onclick = async () => { try { await fetch("/api/history?user_token=" + encodeURIComponent(TOKEN), { method: "DELETE" }); } catch {} histItems = []; renderHistList(); };
     $("theme").onclick = () => {
       const cur = document.documentElement.getAttribute("data-theme");
       const next = cur === "dark" ? "light" : cur === "light" ? "dark" : (matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
@@ -479,7 +500,7 @@
 
     /* ---------- init ---------- */
     if (innerWidth < 760) $("sidebar").classList.add("hidden");
-    refreshBike(); renderHist(); renderSuggest();
+    refreshBike(); renderSuggest(); refreshHistory();
     $("hint").textContent = "Answers come from retrieved manual passages and cite the source page.";
     fetch("/api/meta").then(r => r.json()).then(m => { if (m.min_page) minPage = m.min_page; if (m.max_page) maxPage = m.max_page; }).catch(() => {});
   </script>

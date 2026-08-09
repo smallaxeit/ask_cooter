@@ -157,9 +157,11 @@ python -m askcooter.cli web            # http://127.0.0.1:8000
 ```
 
 A **bike profile** (year + model, default 1986 Softail Custom) tailors answers to
-your machine, and past questions are kept in a local history sidebar. Self-contained
-(no external assets), light/dark aware. Uses `ANSWER_MODEL` and the keys from
-`.env`. Bind elsewhere with `--host` / `--port`.
+your machine. Questions **and their answers are saved to Postgres** (the
+`user_history` table, keyed by an opaque per-browser token); the history sidebar
+loads from the DB, and clicking a past question **replays its saved answer** with
+sources — no API call. Self-contained (no external assets), light/dark aware. Uses
+`ANSWER_MODEL` and the keys from `.env`. Bind elsewhere with `--host` / `--port`.
 
 ## Accessing the database
 
@@ -248,8 +250,9 @@ scripts/
 - **Copyright:** your source PDF may be copyrighted (the Softail manual is).
   Keeping Ask Cooter private/personal is the intended use — see DESIGN.md §6 before
   considering any public deployment.
-- **User history:** the `user_history` table exists but is unused in the MVP
-  (designed forward-compatible; no auth).
+- **User history:** the chat UI writes each Q&A to the `user_history` table, keyed
+  by an opaque client token (no auth). Past questions reload from the DB and replay
+  their saved answers. `GET`/`DELETE /api/history` back the sidebar.
 
 ## License
 

@@ -23,6 +23,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel
 
+from .. import history
 from ..answer import build_chat_messages
 from ..config import cfg
 from ..db import connect
@@ -47,6 +48,7 @@ class AskRequest(BaseModel):
     limit: int | None = None
     history: list[Turn] | None = None
     bike: str | None = None
+    user_token: str | None = None
 
 
 def _sse(obj: dict) -> str:
@@ -57,8 +59,9 @@ def _sse(obj: dict) -> str:
 def api_ask(req: AskRequest) -> StreamingResponse:
     question = (req.question or "").strip()
     results = search_manual(question, limit=req.limit or 6) if question else []
-    history = [t.model_dump() for t in (req.history or [])]
+    chat_history = [t.model_dump() for t in (req.history or [])]
     bike = (req.bike or "").strip() or None
+    user_token = (req.user_token or "").strip() or None
 
     def gen():
         sources = [
@@ -82,8 +85,9 @@ def api_ask(req: AskRequest) -> StreamingResponse:
             yield _sse({"type": "done"})
             return
 
-        system, messages = build_chat_messages(question, results, history, bike=bike)
+        system, messages = build_chat_messages(question, results, chat_history, bike=bike)
         client = anthropic.Anthropic(api_key=cfg.anthropic_api_key)
+        parts: list[str] = []
         try:
             with client.messages.stream(
                 model=cfg.answer_model,
@@ -92,9 +96,20 @@ def api_ask(req: AskRequest) -> StreamingResponse:
                 messages=messages,
             ) as stream:
                 for text in stream.text_stream:
+                    parts.append(text)
                     yield _sse({"type": "token", "text": text})
         except Exception as e:  # noqa: BLE001 — surface to the UI rather than 500
             yield _sse({"type": "error", "message": f"{type(e).__name__}: {e}"})
+
+        answer_text = "".join(parts).strip()
+        if answer_text and user_token:
+            try:
+                history.record(
+                    user_token, question, answer_text,
+                    [s["pdf_page"] for s in sources], bike,
+                )
+            except Exception:  # noqa: BLE001 — never let history writes break the answer
+                pass
         yield _sse({"type": "done"})
 
     return StreamingResponse(gen(), media_type="text/event-stream")
@@ -141,3 +156,15 @@ def api_meta() -> dict:
         "min_page": (mn + 1) if mn is not None else None,
         "max_page": (mx + 1) if mx is not None else None,
     }
+
+
+@app.get("/api/history")
+def api_history(user_token: str = "", limit: int = 100) -> dict:
+    """Saved Q&A for a client token (most recent first), including answers."""
+    return {"items": history.list_for(user_token, limit)}
+
+
+@app.delete("/api/history")
+def api_history_clear(user_token: str = "") -> dict:
+    """Delete all saved history for a client token."""
+    return {"deleted": history.clear(user_token)}

@@ -97,8 +97,9 @@ asks Claude (`ANSWER_MODEL`) to write a direct answer that:
   into links that open the original page (extracted text + the scanned image via
   `/api/page` and `/api/page-image`, with zoom + page-flip via `/api/meta`). A
   **bike profile** (year/model) is sent with each question and injected into the
-  synthesis prompt; question history is kept client-side (localStorage). Note the
-  DB `user_history` table remains unused — history here is browser-local.
+  synthesis prompt. Each Q&A is persisted to the `user_history` table (keyed by an
+  opaque client token) via `/api/history`; the sidebar loads from the DB and
+  clicking a past question replays its saved answer + sources with no API call.
 
 ### 3.5 Citations & page traceability (hard requirement)
 
@@ -129,7 +130,8 @@ chunks(
 )
 -- HNSW cosine index on embedding.
 
--- FUTURE (unused in MVP): no auth → opaque client token.
+-- In use by the chat UI (no auth → opaque client token). Stores each Q&A with
+-- its cited pages and bike profile; the history sidebar reads/deletes via /api/history.
 user_history(
   id, user_token text, question text, answer text,
   cited_pdf_pages int[], bike_profile jsonb, created_at timestamptz
@@ -176,5 +178,5 @@ Done: schema + pgvector (PG18), resumable ingestion with retry/fallback, retriev
 answer synthesis, MCP server (5 tools), CLI, and chat UI. Prototype ingest verified
 end-to-end; full ingest is a user-run step.
 
-Not built (deliberately, for private MVP): auth, remote/HTTP transport, multi-tenant
-hosting, and the `user_history` feature.
+Not built (deliberately, for private MVP): auth, remote/HTTP transport, and
+multi-tenant hosting.
