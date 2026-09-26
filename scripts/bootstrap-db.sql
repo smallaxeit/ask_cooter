@@ -7,7 +7,9 @@
 -- This matches DATABASE_URL in .env.example:
 --   postgresql://cooter:cooter@localhost:5433/askcooter
 
--- Role + database. Change the password if you like (and update .env to match).
+-- Role + database. The password below is a published default and is only
+-- appropriate for a Postgres that listens on localhost. If this instance is
+-- reachable from anywhere else, change it here and in .env to match.
 CREATE ROLE cooter WITH LOGIN PASSWORD 'cooter';
 CREATE DATABASE askcooter OWNER cooter;
 

@@ -161,7 +161,13 @@ your machine. Questions **and their answers are saved to Postgres** (the
 `user_history` table, keyed by an opaque per-browser token); the history sidebar
 loads from the DB, and clicking a past question **replays its saved answer** with
 sources — no API call. Self-contained (no external assets), light/dark aware. Uses
-`ANSWER_MODEL` and the keys from `.env`. Bind elsewhere with `--host` / `--port`.
+`ANSWER_MODEL` and the keys from `.env`.
+
+`--host` / `--port` move the bind address, but there is no authentication: anyone
+who can reach the port can ask questions on your API key, read any page of the
+ingested manual, and read the saved history of any browser token they know. The
+default `127.0.0.1` is the supported configuration. If you need it on another
+machine, put it behind something that authenticates, or use an SSH tunnel.
 
 ## Accessing the database
 
@@ -248,22 +254,35 @@ scripts/
 - **Page numbers:** `pdf_page` is 0-based internally; the CLI and tools print the
   1-based PDF page plus the manual's own printed label so you can always find the
   original.
-- **Copyright:** your source PDF may be copyrighted (the Softail manual is).
-  Keeping Ask Cooter private/personal is the intended use — see DESIGN.md §6 before
-  considering any public deployment.
+- **Copyright:** your source PDF is probably copyrighted (the Softail manual is).
+  Personal use on a manual you own is the intended mode; the ingested text and page
+  images are a copy of it, so keep them local. See DESIGN.md §7 before hosting this
+  anywhere others can reach it.
 - **User history:** the chat UI writes each Q&A to the `user_history` table, keyed
   by an opaque client token (no auth). Past questions reload from the DB and replay
   their saved answers. `GET`/`DELETE /api/history` back the sidebar.
 
 ## License
 
-**PolyForm Noncommercial License 1.0.0** — see [LICENSE](LICENSE). Copyright 2026
-SmallAxeIT. Free to use, modify, and share for **noncommercial** purposes only;
-commercial use is not granted.
+Ask Cooter's own code and documentation are under the **PolyForm Noncommercial
+License 1.0.0** — see [LICENSE](LICENSE). Copyright 2026 SmallAxeIT. Free to use,
+modify, and share for noncommercial purposes; commercial use is not granted.
 
-The Harley-Davidson Softail service manual is **not** part of this repository and
-is not covered by this license; it is copyrighted by its publisher and excluded
-from version control (see `.gitignore`).
+Two things in this repository are **not** covered by that license:
+
+- `pgvector-build/vector--0.8.6.sql` and `vector.control` are unmodified
+  [pgvector](https://github.com/pgvector/pgvector) v0.8.6 files under the
+  PostgreSQL License — see [pgvector-build/LICENSE](pgvector-build/LICENSE).
+- The Harley-Davidson Softail service manual is copyrighted by its publisher. The
+  PDF and the rendered page images are excluded from version control (see
+  `.gitignore`). One extracted page,
+  [`prototype/sample_extraction_page540.json`](prototype/sample_extraction_page540.json),
+  is committed to document the extraction schema and the page-numbering offset;
+  it is a single page of a 651-page manual, kept for that reference purpose.
+
+Ask Cooter is built for personal use on a manual you own. Ingesting a PDF makes a
+searchable copy of it, so treat the database and rendered images the way you'd
+treat the manual itself.
 
 ## Known limitations & tech debt
 

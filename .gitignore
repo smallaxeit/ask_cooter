@@ -5,7 +5,9 @@
 # local scratch notes — contains API keys/passwords
 Setup.txt
 
-# Copyrighted source material and derived page images — do NOT commit
+# Copyrighted source material and derived page images — do NOT commit.
+# (prototype/ holds one extracted page as a schema reference; see README's License
+# section. Keep it to that one.)
 *.pdf
 data/
 
@@ -24,7 +26,3 @@ venv/
 # OS / editor cruft
 .DS_Store
 Thumbs.db
-
-# Local tooling / harness — keep out of the repo
-.claude/
-launch.json

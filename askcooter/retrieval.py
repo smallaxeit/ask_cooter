@@ -2,7 +2,7 @@
 
 Every result carries both page numbers (pdf_page for jumping, printed_page for
 cross-reference) plus the image path, so the caller can always point the user
-back to the original scan (DESIGN.md §3.4).
+back to the original scan (DESIGN.md §3.5).
 """
 from __future__ import annotations
 
@@ -105,7 +105,10 @@ def find_specs(query: str, *, limit: int = 25) -> list[dict]:
     Matches the query against spec name/notes and the page's component tags.
     Returns spec dicts enriched with page citation fields.
     """
-    like = f"%{query.lower()}%"
+    # Escape LIKE metacharacters so a query containing % or _ matches literally
+    # rather than turning into a wildcard.
+    escaped = query.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    like = f"%{escaped}%"
     sql = """
         SELECT p.pdf_page, p.printed_page, p.section, s.spec
         FROM pages p

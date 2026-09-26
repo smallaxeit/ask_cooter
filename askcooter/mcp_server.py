@@ -1,7 +1,7 @@
 """Ask Cooter MCP server.
 
 Exposes the manual as MCP tools over stdio (local, private use — see DESIGN.md
-§3.3). Point Claude Desktop / Claude Code at this module:
+§3.4). Point Claude Desktop / Claude Code at this module:
 
     python -m askcooter.mcp_server
 

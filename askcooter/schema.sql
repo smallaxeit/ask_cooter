@@ -4,7 +4,7 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- One row per PDF page. Stores the vision-extracted text plus structured
--- specs/diagrams and the traceability numbers (see DESIGN.md §3.4).
+-- specs/diagrams and the traceability numbers (see DESIGN.md §3.5).
 CREATE TABLE IF NOT EXISTS pages (
     id             BIGSERIAL PRIMARY KEY,
     pdf_page       INTEGER NOT NULL UNIQUE,   -- position in the PDF file (for jumping)
